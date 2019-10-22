@@ -30,7 +30,9 @@
       @expand-change="(row, expanded) => emitEventHandler('expand-change', row, expanded)"
       >
       <slot name="prepend" />    
-        <TableColumn   v-for="(column, columnIndex) in columns"  :key="columnIndex"  :column="column"  ></TableColumn>
+        <TableColumn   v-for="(column, columnIndex) in columns"  :key="columnIndex"  :column="column"  >
+          <slot  v-if="column.slotName"   slot-scope="scope"  :row="scope.row" :$index="scope.$index"  :slot="column.slotName"  :name="column.slotName"   ></slot>
+        </TableColumn>
       <slot name="append" />
     </el-table>
     <span v-if="ExportOptions.Visible" style="float:left;margin-top: 10px;">
@@ -41,7 +43,7 @@
           :value="option.value">
         </el-option>
       </el-select>
-      <el-button  @click="handleExport"><svg-icon icon-class='export_btn'></svg-icon>导出</el-button>
+      <el-button  @click="handleExport" icon="el-icon-download">导出</el-button>
     </span>
     <div v-if="PaginationOptions.Visible" style="margin-top: 10px;">
       <el-pagination background style="float: right;"
@@ -52,7 +54,7 @@
         :layout="PaginationOptions.Layout"
         :total="Total">
       </el-pagination>
-      <el-button  style="float: right;" svgIcon="refresh" type="success" @click="handleRefresh">刷新</el-button>
+      <el-button  style="float: right;" icon="el-icon-refresh-right" type="success" @click="handleRefresh">刷新</el-button>
     </div>
   </div>
 </template>
@@ -237,6 +239,10 @@ export default class Index extends Vue {
       console.log(result)
       this.Data = result[this.TableOptions.DataKey]
       this.Total = result[this.TableOptions.TotalKey]
+      this.Loading =false
+    }).catch((err:any)=>{
+      this.Data = []
+      this.Total = 0
       this.Loading =false
     })
 

@@ -26,7 +26,11 @@
     :filter-method="column.filterMethod"
     :filtered-value="column.filteredValue"
   > 
-   <TableColumn v-for="(item, index) in column.children" :key="index" :column="item"></TableColumn>  
+     <template   slot-scope="scope" >   
+       <slot  v-if="column.slotName"  :name="column.slotName" :row="scope.row"   :$index="scope.$index"  />
+       <span v-else >{{ column.render ? column.render(scope.row) : scope.row[column.prop] }}</span>
+     </template>
+    <TableColumn v-for="(item, index) in column.children" :key="index" :column="item"></TableColumn>  
   </el-table-column>
 </template>
 

@@ -6,7 +6,9 @@
 
 import Input from '../component/Input.vue'
 import DataPicker from '../component/DataPicker.vue'
+import MouthPicker from '../component/MouthPicker.vue'
 import DataRangePicker from '../component/DataRangePicker.vue'
+import MouthRangePicker from '../component/MouthRangePicker.vue'
 import Select from '../component/Select.vue'
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 
@@ -16,9 +18,11 @@ const ComponentMap = [
   { type:"cascader",component: "el-cascader" },
   { type:"date",component: "DataPicker" },
   { type:"daterange",component: "DataRangePicker" },
+  { type:"month",component: "MouthPicker"},
+  { type:"monthrange",component: "MouthRangePicker"},
 ]
 
-@Component({ components: {Input,DataPicker,DataRangePicker,Select} })
+@Component({ components: {Input,DataPicker,DataRangePicker,Select,MouthPicker,MouthRangePicker} })
 export default class ComponentFactory extends Vue {
 
   @Prop({type: String,default:'',required: true})

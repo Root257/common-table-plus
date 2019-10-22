@@ -27,26 +27,26 @@
        </el-form-item>  -->
 
 
-       <el-form-item label="" style="text-align:left">
-          <el-button v-if="FormOptions.showSearchBtn"
-            type="primary"
-            :size="size"
-            @click.stop
-            svgIcon="search"
-            @click="handlerSearch"
-            :loading="loading">
-            {{ FormOptions.submitBtnText?FormOptions.submitBtnText:"查询"}}
-          </el-button>
-          <el-button type="primary" :plain="true"
-            :size="size" v-if="FormOptions.showResetBtn"
-            @click="handlerReset"
-             svgIcon = "reset"
-            @click.stop
-            >
-            {{ FormOptions.resetBtnText?FormOptions.resetBtnText:"重置"}}
-          </el-button>
-          <slot name="formbutton"></slot>
-        </el-form-item>
+    <el-form-item label="" style="text-align:left">
+      <el-button v-if="FormOptions.showSearchBtn"
+        type="primary"
+        :size="size"
+        @click.stop
+        icon="el-icon-search"
+        @click="handlerSearch"
+        :loading="loading">
+        {{ FormOptions.submitBtnText?FormOptions.submitBtnText:"查询"}}
+      </el-button>
+      <el-button type="primary" :plain="true"
+        :size="size" v-if="FormOptions.showResetBtn"
+        @click="handlerReset"
+        icon="el-icon-refresh"
+        @click.stop
+        >
+        {{ FormOptions.resetBtnText?FormOptions.resetBtnText:"重置"}}
+      </el-button>
+      <slot name="formbutton"></slot>
+    </el-form-item>
   </el-form>
 </template>
 

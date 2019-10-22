@@ -36,13 +36,14 @@ export default class DataPicker extends Vue {
   private editable: Boolean;
 
   @Prop({type: Boolean,default:false,required: false})
-  private showPassword: Boolean;
-
-  @Prop({type: Boolean,default:false,required: false})
   private disabled: Boolean;  
 
   @Prop({type: String,default:'',required: false})
   private placeholder: String;
+
+
+  @Prop({type: String,default:null,required: false})
+  private format: String;
 
   @Prop({type: String,default:'',required: false})
   private startPlaceholder: String;
