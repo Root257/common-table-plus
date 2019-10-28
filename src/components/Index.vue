@@ -1,11 +1,12 @@
 
 <template>
   <div>
-    <Search  v-bind="$attrs"   ref="Search"   :FormOptions="formOptions"   @search="handleSearch" :loading="Loading"   >
+    <Search  v-bind="$attrs"   ref="Search"   v-if="formOptions.visible"  :FormOptions="formOptions"   @search="handleSearch" :loading="Loading"   >
       <template v-for="Item in formOptions.Items">
         <slot  v-if="Item.type ==='custom'&&Item.slotName"   :slot="Item.slotName"  :name="Item.slotName"   ></slot>
       </template>
     </Search>
+    <slot name="buttons"/>
     <el-table v-loading.lock="Loading"
       ref="table"
       element-loading-text="拼命加载中"
@@ -14,7 +15,7 @@
       :data="Data"
       @select="(selection, row) => emitEventHandler('select', selection, row)"
       @select-all="selection => emitEventHandler('select-all', selection)"
-      @selection-change="selection => emitEventHandler('selection-change', selection)"
+      @selection-change="handleSelectionChange"
       @cell-mouse-enter="(row, column, cell, event) => emitEventHandler('cell-mouse-enter', row, column, cell, event)"
       @cell-mouse-leave="(row, column, cell, event) => emitEventHandler('cell-mouse-leave', row, column, cell, event)"
       @cell-click="(row, column, cell, event) => emitEventHandler('cell-click', row, column, cell, event)"
@@ -53,6 +54,7 @@
         :page-size="Pagination.pageSize"
         :layout="PaginationOptions.Layout"
         :total="Total">
+        <slot>  <el-button  @click="handleExport" plain>查看全部</el-button>  <span class="el-pagination__total" >选中{{SelectionCount}}条</span></slot>
       </el-pagination>
       <el-button  style="float: right;" icon="el-icon-refresh-right" type="success" @click="handleRefresh">刷新</el-button>
     </div>
@@ -91,11 +93,13 @@ export default class Index extends Vue {
   }
  //导出配置项
   private ExportOptions:any={
-    Visible:true,
+    Visible:false,
     Key:"export",
     Options:[{label: "导出当前",value: "exportCurrent",},{label: "导出全部",value: "exportAll",}]
   }
 
+  private Selection:Array<any>=[]
+  private SelectionCount:Number=0
 
   //分页配置项
   @Prop({type: Object,default(){return {}},required: false})
@@ -110,11 +114,28 @@ export default class Index extends Vue {
     Visible:true,
     IndexKey:"currentPage",
     PageSizeKey:"pageSize",
-    Layout:'total, prev, pager, next, jumper, sizes',
+    Layout:'total,slot,prev, pager, next, jumper, sizes',
     PageSizes:[10, 20, 50, 100, 500, 1000]
   }
+  handleSelectionChange(selection:Array<any>){
+    this.Selection = selection
+    this.SelectionCount = selection.length
+  }
+  //返回已经选择的行数据
+  public getSelectionRows():Array<any>{
+    return this.Selection
+  }
 
-
+  //选择行
+  public toggleSelection(rows:Array<any>) {
+    if (rows) {
+        rows.forEach(row => {
+          let ref:any = this.$refs.table
+          ref.toggleRowSelection(row)
+        })
+      }
+      this.init()
+    }
 
 
 
@@ -192,7 +213,7 @@ export default class Index extends Vue {
 
   //外部参数
   @Prop({type: Object,default(){return {}},required: false})
-  private Params: Object;
+  private params: Object;
 
   // private FormItemsSlot:Array<any> = []
   
@@ -226,9 +247,10 @@ export default class Index extends Vue {
     this.init()
   }
   init(){
-    if (this.TableOptions.Remote&&this.TableOptions.AutoLoad) {
+    if (this.TableOptions.Remote&&this.TableOptions.AutoLoad&&this.TableOptions.RemoteMethod) {
       let Params = this.getParams()
       this.getRemoteData(Params)
+      // this.init()
     }
   }
 
@@ -268,15 +290,19 @@ export default class Index extends Vue {
 
   private handleSearch(SearchParams:Object){
     let  Params = {}
-    Params = Object.assign(Params,SearchParams,this.getPageParams(),this.FiltersParams,this.Params)
+    Params = Object.assign(Params,SearchParams,this.getPageParams(),this.FiltersParams,this.params)
     this.getRemoteData(Params)
   }
 
   //获取筛选条件参数
   private getSearchParams():Object {
-    let ref:any = this.$refs.Search
-    let SearchParams:Object = ref.getParams()
-    return  SearchParams
+    if(this.formOptions.visible === true){
+      let ref:any = this.$refs.Search
+      let SearchParams:Object = ref.getParams()
+      return  SearchParams
+    }else{
+       return  {}
+    }
   }
 
   //获取分页条件参数
@@ -293,12 +319,17 @@ export default class Index extends Vue {
   //获取查询参数
   private getParams():Object {
     let Params = {}
-    Params =  Object.assign(Params,this.getSearchParams(),this.getPageParams(),this.FiltersParams,this.Params)
+    Params =  Object.assign(Params,this.getSearchParams(),this.getPageParams(),this.FiltersParams,this.params)
     return  Params
   }
 
-  private handleRefresh() {
-    // this.$refs.searchForm.searchHandler()
+  private handleRefresh(){
+    this.refresh()
+  }
+
+  public refresh() {
+    let Params = this.getParams()
+    this.getRemoteData(Params)
   }
 
   private handleSizeChange(size:Number) {

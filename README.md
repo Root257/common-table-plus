@@ -19,6 +19,43 @@
 |exportOptions|导出配置项||
 
 
+ 
+
+
+columns配置项详解 
+为了防止tableOptions过于复杂，故将表格的列配置单独拿出,columns为数组
+|字段名|说明|类型|可选值|默认值| 
+|----|----|----|----|----|
+|type|类型|string|selection/index/expand|-|
+|prop|对应列内容的字段名|String|-|-|
+|label|标签文本|String|-|-|
+|width|宽度|Number|-|-|
+
+
+
+
+
+
+formOptions配置项详解
+|字段名|说明|类型|可选值|默认值|
+|----|----|----|----|----|
+|visible|是否显示搜索条件|boolean|true 或 false|true|
+|formType|表单类型,分为简单和折叠两种类型|String|simple 简单 或 collapse:折叠|simple|
+|inline|行内表单模式|boolean|true 或 false|false|
+|showSearchBtn|是否显示搜索按钮|boolean|true 或 false|true|
+|searchBtnText|搜索按钮文字|String|-|查询|
+|showResetBtn|是否显示搜索按钮|boolean|true 或 false|true|
+|ResetBtnText|重置按钮文字|String|-|重置|
+|items|表单域|Array|-|[]|
+
+
+
+
+
+
+
+ 
+
 
 ## Project setup
 

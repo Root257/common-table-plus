@@ -1,9 +1,21 @@
 
 <template>
-  <el-table-column  
-    :column-key="column.columnKey"
+  <el-table-column  v-if="column.type==='selection'"
+    :column-key="column.key"
+    :type="column.type" 
+    :reserve-selection="column.reserveSelection"
+    >
+  </el-table-column>
+   <el-table-column  v-else-if="column.type==='index'"
+    :column-key="column.key"
+    :type="column.type" 
+    :index="column.index"
+    >
+  </el-table-column>
+  <el-table-column   v-else 
+    :column-key="column.key"
     :prop="column.prop"
-    :type="column.colType"
+    :type="column.type"
     :label="column.label"
     :fixed="column.fixed"
     :width="column.width"
