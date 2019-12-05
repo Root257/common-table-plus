@@ -1,6 +1,6 @@
 {
   "name": "common-table-plus",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description":"通用Table组件",
   "main":"dist/common-table-plus.umd.min.js",
   "types": "typings/Index.d.ts",

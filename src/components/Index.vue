@@ -54,7 +54,7 @@
         :page-size="Pagination.pageSize"
         :layout="PaginationOptions.Layout"
         :total="Total">
-        <slot>  <el-button  @click="handleExport" plain>查看全部</el-button>  <span class="el-pagination__total" >选中{{SelectionCount}}条</span></slot>
+        <slot>  <el-button  @click="handleViewAll" plain>查看全部</el-button>  <span class="el-pagination__total" >选中{{SelectionCount}}条</span></slot>
       </el-pagination>
       <el-button  style="float: right;" icon="el-icon-refresh-right" type="success" @click="handleRefresh">刷新</el-button>
     </div>
@@ -70,7 +70,7 @@ import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 @Component({ components: {Search,TableColumn} })
 export default class Index extends Vue {
 
-  //是否显示导出
+  //表单配置项
   @Prop({type: Object,default(){return {Items:[]}},required: false})
   private formOptions: any;
 
@@ -80,10 +80,18 @@ export default class Index extends Vue {
   //     return 
   //   })
   // }
-     
+  //表格选中数据
+  @Prop({type: Array,default(){return []},required: false})
+  private selection: Array<any>;
 
+  private Selection:Array<any>=[]
+  private SelectionCount:Number=0  
+
+
+     
+  //导出配置项
   private ExportSelect:String|Number = "导出当前"
-  // 导出配置项
+
   @Prop({type: Object,default(){return {}},required: false})
   private exportOptions: Array<any>;
 
@@ -98,9 +106,6 @@ export default class Index extends Vue {
     Options:[{label: "导出当前",value: "exportCurrent",},{label: "导出全部",value: "exportAll",}]
   }
 
-  private Selection:Array<any>=[]
-  private SelectionCount:Number=0
-
   //分页配置项
   @Prop({type: Object,default(){return {}},required: false})
   private paginationOptions: Array<any>;
@@ -109,7 +114,7 @@ export default class Index extends Vue {
   onPaginationOptionsChanged(newV: Object, oldV: Object) { 
     this.PaginationOptions =  Object.assign(this.PaginationOptions,newV)
   }
- //分页配置项
+
   private PaginationOptions:any={
     Visible:true,
     IndexKey:"currentPage",
@@ -117,25 +122,33 @@ export default class Index extends Vue {
     Layout:'total,slot,prev, pager, next, jumper, sizes',
     PageSizes:[10, 20, 50, 100, 500, 1000]
   }
+
+
+
+
   handleSelectionChange(selection:Array<any>){
     this.Selection = selection
     this.SelectionCount = selection.length
   }
-  //返回已经选择的行数据
-  public getSelectionRows():Array<any>{
-    return this.Selection
-  }
+ 
+  //查看全部处理函数
+  private handleViewAll(){
+    this.Pagination.currentPage =1
+    this.Pagination.pageSize = this.Total
 
+    let Params = this.getParams()
+    this.getRemoteData(Params)
+  }
   //选择行
   public toggleSelection(rows:Array<any>) {
     if (rows) {
-        rows.forEach(row => {
-          let ref:any = this.$refs.table
-          ref.toggleRowSelection(row)
-        })
-      }
-      this.init()
+      rows.forEach(row => {
+        let ref:any = this.$refs.table
+        ref.toggleRowSelection(row)
+      })
     }
+    this.init()
+  }
 
 
 
@@ -200,14 +213,13 @@ export default class Index extends Vue {
 
 
    //表格数据
-  @Prop({type: Object,default(){return {}},required: false})
+  @Prop({type: Array,default(){return []},required: false})
   private data: Object;
 
   @Watch("data", { immediate: true, deep: true })
   onDataChanged(newV: Array<any>, oldV: Array<any>) {  
     this.Data = newV
   }
-   //表格数据
   private  Data:Array<any> = []
 
 
@@ -258,7 +270,6 @@ export default class Index extends Vue {
   private  getRemoteData(Params:Object){
     this.Loading =true
     this.TableOptions.RemoteMethod(Params).then((result:any)=>{
-      console.log(result)
       this.Data = result[this.TableOptions.DataKey]
       this.Total = result[this.TableOptions.TotalKey]
       this.Loading =false
@@ -366,6 +377,14 @@ export default class Index extends Vue {
     //   this.$set(this, 'selectData', ...Array.from(arguments).slice(1))
     // }
     this.$emit(event, ...Array.from(arguments))
+  }
+
+
+
+
+   //返回已经选择的行数据
+  public getSelectionRows():Array<any>{
+    return this.Selection
   }
 
 }
